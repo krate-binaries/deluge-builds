@@ -1,93 +1,60 @@
 # Deluge Builds
 
-Pre-built Deluge BitTorrent client packages for various Linux distributions.
+Deluge packages (CLI + daemon + web UI) built in CI via [krate-binaries/tools](https://github.com/krate-binaries/tools) (`tools/packages/deluge/build.sh`) and [rasterbar-builds](https://github.com/krate-binaries/rasterbar-builds) for **libtorrent-rasterbar**.
 
-## 🎯 Features
+**Source of truth (local monorepo):** `extras/packages/deluge/` — same tree as the `tools` repo on GitHub.
 
-- Pre-compiled binaries ready to use
-- Multiple distribution support (Debian/Ubuntu)
-- Automated builds via GitHub Actions
-- JSON metadata for automated installations
-- System-wide installation in `/usr/local`
-- Comprehensive dependency management
-- Multiple stability channels (stable, oldstable, next)
-- Built using pre-compiled libtorrent-rasterbar packages
+## CI build target
 
-## 📦 Available Packages
+- **OS**: a single matrix row — a **reference Debian** environment for compiling (`matrix.py`). Published `.deb` files are the **same artifacts** for recent **Debian or Ubuntu** installs on **amd64** (not a separate package per distribution release).
+- Container / workflow details: see `matrix.py` and `.github/workflows/build.yaml`.
 
-Each release provides packages for different combinations of:
-- Deluge versions (2.0.5, 2.1.0, 2.1.1, 2.1.2.dev0)
-- libtorrent-rasterbar versions (2.0.6 through 2.0.11)
-- Distributions:
-  - Debian: 11 (bullseye), 12 (bookworm)
-  - Ubuntu: 22.04 (jammy), latest
+## Deluge versions
 
-### Version Matrix
+The matrix is defined in `matrix.py`:
 
-| Deluge Version | libtorrent Version | Distributions | Stability |
-|----------------|-------------------|---------------|-----------|
-| 2.0.5 | 2.0.6 | debian-11, ubuntu-22.04 | oldstable |
-| 2.1.0 | 2.0.7-2.0.10 | debian-11/12, ubuntu-22.04, ubuntu-latest | oldstable |
-| 2.1.1 | 2.0.11 | debian-12, ubuntu-latest | stable |
-| 2.1.2.dev0 | 2.0.11 | debian-12, ubuntu-latest | next |
+| Deluge (upstream) | libtorrent-rasterbar | Deluge Git branch / ref                         |
+| ----------------- | -------------------- | ----------------------------------------------- |
+| **2.1.1**         | **2.0.11**           | tag `deluge-2.1.1`                              |
+| **2.2.0**         | **2.0.11**           | tag `deluge-2.2.0`                              |
+| **latest**        | **2.0.11**           | **`develop`** branch (moving tip, no fixed tag) |
 
-## 📋 Installation
+The **Actions** workflow (`.github/workflows/build.yaml`) triggers **only** on **`workflow_dispatch`**: nothing runs on **push** to `main`. From the **Actions** tab, run the workflow and choose **`all`** or a specific version (**`2.1.1`**, **`2.2.0`**, **`latest`**).
 
-### Manual Installation
-1. Download the appropriate .deb package for your distribution from the [Releases](../../releases) page
-2. Install using: `sudo dpkg -i package_name.deb`
-3. Fix any dependencies if needed: `sudo apt-get install -f`
+## Debian package name vs `.deb` filename
 
-### Package Structure
-Once installed, the package places:
-- Binaries in `/usr/local/bin`
-- Libraries in `/usr/local/lib`
-- Configuration files in `/etc/deluge`
+- Debian **`Package:`** field: **`deluge`** (no `krate-` prefix in metadata).
+- **Output filename**: `krate-deluge_<version>-<build>_amd64.deb` (the **`krate-`** prefix applies to the **release filename** only).
 
-## 🔧 Build Requirements
+## On-disk layout
 
-To build Deluge, you need:
-- build-essential
-- python3-dev
-- libtorrent-rasterbar (automatically downloaded from MediaEase-binaries/rasterbar-builds)
-- openssl
-- zlib1g-dev
+After installing the `.deb`, application files live under:
 
-### Dependencies
+`/opt/Krate/vendor/deluge_<deluge_version>_lt_<libtorrent_version>/usr/`
 
-The build process automatically:
-1. Downloads the appropriate libtorrent-rasterbar packages from MediaEase-binaries/rasterbar-builds
-2. Installs the required runtime, development, and Python binding packages
-3. Manages all other system dependencies
+Examples:
 
-### Local Building
-To manually build a Deluge package:
-```bash
-./build.sh <VERSION>
-# Example: ./build.sh 2.1.1
-```
+- Binaries: `.../usr/bin/` (`deluged`, `deluge-web`, `deluge-console`, …)
+- Python tree: `.../usr/lib/python3/dist-packages/` (Python revision depends on the build image)
 
-## 📄 Metadata
+Debian alternatives and APT preferences are handled by package scripts (see the `tools` repo).
 
-Each package is accompanied by its JSON metadata file containing:
-- Package information
-- Checksums
-- Dependencies
-- Build configuration
-- Distribution details
+## Build dependencies
 
-## 🔍 Package Details
+The pipeline installs **Boost** from the **krate-binaries/boost-builds** release matching `boost_version` in `matrix.py` (shared install script with rasterbar-builds). It also downloads prebuilt **libtorrent-rasterbar** / Python bindings from **krate-binaries/rasterbar-builds**, plus other dependencies listed in `tools/packages/deluge/build.sh` (maintained in the `tools` repo / `extras/packages/deluge/` locally).
 
-The packages are built with:
-- Python 3 support
-- System-wide installation in `/usr/local`
-- Proper dependency management
-- Configuration files in `/etc/deluge`
-- Automated service management
-- Pre-built libtorrent-rasterbar integration
+## Manual installation
 
-## 📝 License
+1. Download the `.deb` and matching `.json` from [Releases](https://github.com/krate-binaries/deluge-builds/releases).
+2. `sudo dpkg -i <file>.deb`
+3. If needed: `sudo apt-get install -f`
 
-This repository is licensed under the terms specified in the LICENSE file.
+## Metadata
 
-Deluge itself is distributed under the [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.html). 
+Each build publishes a **JSON** file next to the `.deb` (checksums, OS, version, etc.), generated by `tools/generate_metadata.sh`.
+
+## License
+
+This repository is licensed under the project LICENSE file.
+
+Deluge is distributed under the [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.html).
