@@ -224,7 +224,7 @@ jobs:
           ls -la artifacts/
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: steps.deluge.outputs.deluge == 'done'
         with:
           name: deluge-${{ matrix.version }}_lt_${{ matrix.libtorrent_version }}_${{ matrix.os }}
@@ -290,7 +290,7 @@ jobs:
 
       - name: Create Release
         if: steps.prepare.outputs.skip_release == 'false'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ matrix.version }}
           name: Deluge ${{ matrix.version }}
