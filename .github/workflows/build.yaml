@@ -254,7 +254,7 @@ jobs:
           path: tools
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: downloaded_artifacts
           pattern: deluge-${{ matrix.version }}_lt_*
