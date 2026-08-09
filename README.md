@@ -1,6 +1,6 @@
 # Deluge Builds
 
-Deluge packages (CLI + daemon + web UI) built in CI via [krate-binaries/tools](https://github.com/krate-binaries/tools) (`tools/packages/deluge/build.sh`) and [rasterbar-builds](https://github.com/krate-binaries/rasterbar-builds) for **libtorrent-rasterbar**.
+Deluge packages (CLI + daemon + web UI) built in CI via [krate-apps/tools](https://github.com/krate-apps/tools) (`tools/packages/deluge/build.sh`) and [rasterbar-builds](https://github.com/krate-apps/rasterbar-builds) for **libtorrent-rasterbar**.
 
 **Source of truth (local monorepo):** `extras/packages/deluge/` — same tree as the `tools` repo on GitHub.
 
@@ -41,11 +41,11 @@ Debian alternatives and APT preferences are handled by package scripts (see the 
 
 ## Build dependencies
 
-The pipeline installs **Boost** from the **krate-binaries/boost-builds** release matching `boost_version` in `matrix.py` (shared install script with rasterbar-builds). It also downloads prebuilt **libtorrent-rasterbar** / Python bindings from **krate-binaries/rasterbar-builds**, plus other dependencies listed in `tools/packages/deluge/build.sh` (maintained in the `tools` repo / `extras/packages/deluge/` locally).
+The pipeline installs **Boost** from the **krate-apps/boost-builds** release matching `boost_version` in `matrix.py` (shared install script with rasterbar-builds). It also downloads prebuilt **libtorrent-rasterbar** / Python bindings from **krate-apps/rasterbar-builds**, plus other dependencies listed in `tools/packages/deluge/build.sh` (maintained in the `tools` repo / `extras/packages/deluge/` locally).
 
 ## Manual installation
 
-1. Download the `.deb` and matching `.json` from [Releases](https://github.com/krate-binaries/deluge-builds/releases).
+1. Download the `.deb` and matching `.json` from [Releases](https://github.com/krate-apps/deluge-builds/releases).
 2. `sudo dpkg -i <file>.deb`
 3. If needed: `sudo apt-get install -f`
 
