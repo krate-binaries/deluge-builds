@@ -95,7 +95,7 @@ jobs:
         shell: bash
         run: |
           apt-get update -qq
-          # tools/packages/deluge/build.sh (krate-binaries/tools): git + venv/pip; Boost & libtorrent from Releases
+          # tools/packages/deluge/build.sh (krate-apps/tools): git + venv/pip; Boost & libtorrent from Releases
           apt-get install -yqq --no-install-recommends \
             ca-certificates curl wget git jq \
             lsb-release gnupg debian-archive-keyring debian-keyring \
@@ -115,7 +115,7 @@ jobs:
         if: steps.bootstrap.outputs.bootstrap == 'done'
         uses: actions/checkout@v6
         with:
-          repository: krate-binaries/tools
+          repository: krate-apps/tools
           path: tools
 
       - name: Prepare tools scripts
@@ -141,7 +141,7 @@ jobs:
           download_asset() {
             local version="$1"
             local filename="$2"
-            local repo="krate-binaries/rasterbar-builds"
+            local repo="krate-apps/rasterbar-builds"
             local assets_url=$(curl -s "https://api.github.com/repos/${repo}/releases/tags/v${version}" | jq -r '.assets_url')
             if [ -z "$assets_url" ] || [ "$assets_url" = "null" ]; then
               echo "Release not found"
@@ -250,7 +250,7 @@ jobs:
       - name: Checkout tools repository
         uses: actions/checkout@v6
         with:
-          repository: krate-binaries/tools
+          repository: krate-apps/tools
           path: tools
 
       - name: Download artifacts
